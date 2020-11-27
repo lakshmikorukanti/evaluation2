@@ -2,7 +2,7 @@ const Employee = require('../models/employee');
 
 const getEmployeeDetails = async (req, res, next) => {
     let { gender, date, name } = req.query;
-    console.log(gender, date, name, req.query.page);
+    console.log(gender, date, name, req.query);
 
     console.log(gender, date, name, req.query.page);
     const limit = Number(req.query.limit);
@@ -11,7 +11,7 @@ const getEmployeeDetails = async (req, res, next) => {
         page = Number(req.query.page);
     }
     let sortByDate = date == 'asc' ? 1 : date == 'desc' ? -1 : 0;
-    if (gender != undefined && name == undefined) {
+    if (gender != '' && name == '') {
         const employeeDataCount = await Employee.countDocuments(
             {
                 gender: { $regex: gender }
@@ -55,7 +55,7 @@ const getEmployeeDetails = async (req, res, next) => {
             console.log(err);
             return res.status(500).send('Something went wrong');
         }
-    } else if (name != undefined && gender != undefined) {
+    } else if (name != '' && gender != '') {
         const employeeDataCount = await Employee.countDocuments(
             {
                 name: { $regex: name },
@@ -85,7 +85,7 @@ const getEmployeeDetails = async (req, res, next) => {
         });
         const finalPage = Math.ceil(employeeDataCount / limit);
         try {
-            const results = await Employee.find({})
+            const results = await Employee.find({ gender: { $regex: gender } })
                 .sort({ joining_date: sortByDate })
                 .skip((page - 1) * limit)
                 .limit(limit);

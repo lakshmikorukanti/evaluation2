@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Paper, TextField } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
@@ -41,21 +41,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 export default function Home(props) {
-    let [ waste, query ] = window.location.href.split('?');
-    let queryObj = {};
-    if (query != undefined) {
-        query = query.split('&');
-        for (let i = 0; i < query.length; i++) {
-            const [ key, value ] = query[i].split('=');
-            queryObj[key] = value;
-        }
-    }
+    let query = new URLSearchParams(useLocation().search);
     const { employeeData, totalPages } = useSelector((state) => state.auth);
     const { isAuth, error } = useSelector((state) => state.auth);
-    const [ name, setName ] = useState(queryObj['name'] || '');
-    const [ date, setDate ] = useState(queryObj['date'] || '');
-    const [ gender, setGender ] = useState(queryObj['gender'] || '');
-    const [ page, setPage ] = useState(queryObj['page'] || 1);
+    const [ name, setName ] = useState(query.get('name') || '');
+    const [ date, setDate ] = useState(query.get('date') || '');
+    const [ gender, setGender ] = useState(query.get('gender') || '');
+    const [ page, setPage ] = useState(query.get('page') || 1);
     const perPage = 5;
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -71,11 +63,6 @@ export default function Home(props) {
 
     const handleLogout = (e) => {
         dispatch(logoutUser(e));
-    };
-
-    const handlePage = (e, index) => {
-        setPage(index + 1);
-        history.push(`/Home/dashboard?limit=${perPage}&page=${index + 1}&name=${name}&date=${date}&gender=${gender}`);
     };
 
     return (
@@ -103,7 +90,7 @@ export default function Home(props) {
                                 type="text"
                                 autoComplete="current-password"
                                 variant="outlined"
-                                onChange={(e) => setName(e.target.name)}
+                                onChange={(e) => setName(e.target.value)}
                             />
                         </Grid>
                     </Grid>
@@ -146,9 +133,9 @@ export default function Home(props) {
                                 <Select
                                     labelId="demo-simple-select-outlined-label"
                                     name="gender"
+                                    value={gender}
                                     onChange={(e) => setGender(e.target.value)}
                                     label="gender"
-                                    value={gender}
                                 >
                                     <MenuItem value="">
                                         <em>None</em>
@@ -188,7 +175,7 @@ export default function Home(props) {
                             variant="contained"
                             style={{ marginLeft: '10px' }}
                             color="secondary"
-                            onClick={(e) => handlePage(e, index)}
+                            onClick={(e) => setPage(index + 1)}
                         >
                             {index + 1}
                         </Button>

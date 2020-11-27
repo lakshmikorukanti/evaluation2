@@ -3,7 +3,7 @@ import { Switch, Route } from 'react-router-dom';
 import Register from '../Components/Register';
 import Login from '../Components/Login';
 import Home from '../Components/Home';
-import Pagination from '../Components/Pagination';
+
 export default function Routing(props) {
     return (
         <Switch>
